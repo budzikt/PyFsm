@@ -11,43 +11,37 @@ import argparse
 import sys
 from enum import Enum
 
-class confKeys(Enum):
-    initState = 0;
-    stateList = 1;
+#LocalImports
+import utils
 
 class eventKeys(Enum):
-    name = 0
-    prevStates = 1
-    nextStates = 2
+    prevStates = 0
+    nextStates = 1
 
-configPart = {
-            'initState': ['state_initialState', [], ['state_postInit', 'state_Run']],
-            'stateList': []
-              
-              }
-
+configPart= {   'initState': 'st_initial',
+                'stateList': [      
+                    {'st_initial':  [ [],             ['st_Run', 'st_shutdown'] ]   },
+                    {'st_Run':      [ ['st_initial'], ['st_shutdown'] ]             },
+                    {'st_shutdown': [ ['st_initial','st_Run'], ['st_initial']]      },
+                              
+                ], #End Statelist
+            }
 
 class FsmTests(unittest.TestCase):
-    def testAlwaysPass(self):
-        """This is sanity test for tests"""
-        self.assertEqual(1, 1)
     
-    def testCfgHasInit(self):
+    testCfg = configPart
+    
+    def testCfgIsMap(self):
+        """Configuration shall be stored in dictionary"""
+        self.assertTrue(isinstance(FsmTests.testCfg, dict))
+    def testCfgHasInitState(self):
         """Configuration shall have a initialState"""
-
-def parseCmdArgs():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('path')
-    parser.add_argument('-tr', '-testrun', '-TestRun', action='store_true', dest='tr')
-    args = parser.parse_args(sys.argv)
-    return vars(args)
-    
-def testNeeded(argsDict):
-    if 'tr' in argsDict and argsDict['tr'] == True:
-        return True
-    else:
-        return False
-    
+        self.assertTrue('initState' in FsmTests.testCfg)
+    def testInitStateHaveNextState(self):
+        """Initial state shall have at least one succesor state"""
+        initKey = FsmTests.testCfg['initState']
+        self.assertTrue(FsmTests.testCfg['stateList'][0] != None)
+   
 #Manage argvars to run unittests      
 def mainTest():
     argsTemp = list(sys.argv)
@@ -58,8 +52,8 @@ def mainTest():
 #RUN as script
 if __name__ == "__main__":
     print("\n\n***RUN AS MAIN***\nRun as script with arglist: " + '\n' + str(sys.argv))
-    argMap = parseCmdArgs()
-    if(testNeeded(argMap)):
+    argMap = utils.parseCmdArgs()
+    if(utils.testNeeded(argMap)):
         print('Run Unit Tests')
         mainTest()
     else:
