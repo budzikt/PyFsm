@@ -19,12 +19,12 @@ class eventKeys(Enum):
     nextStates = 1
 
 configPart= {   'initState': 'st_initial',
-                'stateList': [      
-                    {'st_initial':  [ [],             ['st_Run', 'st_shutdown'] ]   },
-                    {'st_Run':      [ ['st_initial'], ['st_shutdown'] ]             },
-                    {'st_shutdown': [ ['st_initial','st_Run'], ['st_initial']]      },
+                'stateList': {      
+                    'st_initial':  [ [],             ['st_Run', 'st_shutdown'] ]   ,
+                    'st_Run':      [ ['st_initial'], ['st_shutdown'] ]             ,
+                    'st_shutdown': [ ['st_initial','st_Run'], ['st_initial']]      ,
                               
-                ], #End Statelist
+                }, #End Statelist
             }
 
 class FsmTests(unittest.TestCase):
@@ -40,7 +40,11 @@ class FsmTests(unittest.TestCase):
     def testInitStateHaveNextState(self):
         """Initial state shall have at least one succesor state"""
         initKey = FsmTests.testCfg['initState']
-        self.assertTrue(FsmTests.testCfg['stateList'][0] != None)
+        self.assertTrue(FsmTests.testCfg['stateList'][initKey][eventKeys.nextStates.value] != [])
+    def testInistalStateNotHavePrevState(self):
+        """Initial state may not have previous state"""
+        initKey = FsmTests.testCfg['initState']
+        self.assertTrue(FsmTests.testCfg['stateList'][initKey][eventKeys.prevStates.value] == [])
    
 #Manage argvars to run unittests      
 def mainTest():
