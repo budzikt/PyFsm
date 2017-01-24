@@ -26,6 +26,8 @@ configPart= {   'initState': 'st_initial',
                               
                 }, #End Statelist
             }
+configActions = {
+    }
 
 class FsmTests(unittest.TestCase):
     
